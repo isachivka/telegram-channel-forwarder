@@ -38,17 +38,17 @@ A Python script that forwards messages from one Telegram channel to another usin
 
    To use this script, you need to get your `api_id` and `api_hash` from the [Telegram API Development Tools](https://my.telegram.org/apps).
 
-2. **Configure the Script**
+2. **Configure Environment Variables**
 
-   Open the `script.py` file and fill in the following variables:
+   Create a `.env` file in the project root with the following values:
 
-   ```python
-   api_id = 'YOUR_API_ID'
-   api_hash = 'YOUR_API_HASH'
-   phone_number = '+YOUR_PHONE_NUMBER'
-   session_name = 'YOUR_SESSION_NAME'
-   source_channel_id = 'SOURCE_CHANNEL_ID'
-   destination_channel_id = 'DESTINATION_CHANNEL_ID'
+   ```env
+   APP_ID=123456
+   API_HASH=your_api_hash
+   PHONE_NUMBER=+1234567890
+   SESSION_NAME=your_session_name
+   SOURCE_CHANNEL_ID=source_channel_id_or_username
+   DESTINATION_CHANNEL_ID=destination_channel_id_or_username
    ```
 
 3. **Run the Script**
@@ -63,7 +63,7 @@ A Python script that forwards messages from one Telegram channel to another usin
 
 ## How It Works
 
-- The script connects to the Telegram client using the provided credentials.
+- The script connects to the Telegram client using the provided `.env` credentials.
 - It fetches messages from the specified source channel and forwards them to the destination channel.
 - A JSON file (`last_message.json`) is used to keep track of the last sent message, ensuring no message is sent twice.
 

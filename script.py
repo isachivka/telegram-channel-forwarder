@@ -5,15 +5,62 @@ import json  # Importing JSON module to handle reading and writing JSON files
 import os  # Importing os module to interact with the operating system (e.g., file operations)
 import random  # Importing random module to add random delays
 
+def load_env(path: str = '.env') -> None:
+    """
+    Minimal .env loader to avoid extra dependencies.
+    Supports KEY=VALUE lines, ignores empty lines and comments (# ...).
+    """
+    if not os.path.exists(path):
+        return
+
+    with open(path, 'r') as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith('#'):
+                continue
+
+            if '=' not in line:
+                continue
+
+            key, value = line.split('=', 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
+def getenv_required(name: str) -> str:
+    value = os.getenv(name)
+    if value is None or value.strip() == '':
+        raise ValueError(f"Missing required environment variable: {name}")
+    return value.strip()
+
+
+def parse_int(value: str, name: str) -> int:
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+
+
+def parse_channel_id(value: str) -> str | int:
+    stripped = value.strip()
+    if stripped.lstrip('-').isdigit():
+        return int(stripped)
+    return stripped
+
+
+load_env()
+
 # Initial settings for Telegram API access
-api_id = 'YOUR_API_ID'  # Your Telegram API ID
-api_hash = 'YOUR_API_HASH'  # Your Telegram API Hash
-phone_number = '+YOUR_PHONE_NUMBER'  # Your phone number with country code
-session_name = 'YOUR_SESSION_NAME'  # Session name for the Telegram client
+api_id = parse_int(getenv_required('APP_ID'), 'APP_ID')  # Your Telegram API ID
+api_hash = getenv_required('API_HASH')  # Your Telegram API Hash
+phone_number = getenv_required('PHONE_NUMBER')  # Your phone number with country code
+session_name = getenv_required('SESSION_NAME')  # Session name for the Telegram client
 
 # Channel IDs for the source and destination channels
-source_channel_id = 'SOURCE_CHANNEL_ID'  # Source channel ID
-destination_channel_id = 'DESTINATION_CHANNEL_ID'  # Destination channel ID
+source_channel_id = parse_channel_id(getenv_required('SOURCE_CHANNEL_ID'))  # Source channel ID
+destination_channel_id = parse_channel_id(getenv_required('DESTINATION_CHANNEL_ID'))  # Destination channel ID
 
 # File to store the ID of the last sent message
 last_message_file = 'last_message.json'
