@@ -6,6 +6,7 @@ A Python script that forwards messages from one Telegram channel to another usin
 
 - **Forward text and media messages**: Forward text and media messages from a source channel to a destination channel.
 - **Keep albums together**: Multi-photo posts are forwarded as a single album with the original caption.
+- **Safe caption length**: Captions are trimmed to 900 characters with `...` to avoid Telegram limits.
 - **Track last sent message**: Keeps track of the last sent message to avoid duplicate forwarding.
 - **Persistent Telegram session**: The session is saved locally, so you don’t need to re-enter the login code every time you run the script. This prevents getting temporarily blocked by Telegram for too many login requests.
 - **Resume from the last sent message**: If the program stops for any reason (e.g., internet issues), it can resume from the last sent message after restarting.
