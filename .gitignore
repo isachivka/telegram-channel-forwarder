@@ -2,3 +2,5 @@
 .prod_key
 .test_key
 .idea
+*.session
+last_message.json

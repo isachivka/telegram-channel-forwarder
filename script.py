@@ -79,27 +79,73 @@ async def handle_telegram_session(client):
             except json.JSONDecodeError:
                 last_message = None
 
+    async def send_group(messages):
+        if not messages:
+            return
+
+        media_items = []
+        caption = None
+        last_id = messages[-1].id
+
+        for msg in messages:
+            if caption is None and msg.text:
+                caption = msg.text
+            if isinstance(msg.media, (MessageMediaPhoto, MessageMediaDocument)):
+                media_items.append(msg.media)
+
+        if media_items:
+            await client.send_file(destination_channel_id, media_items, caption=caption)
+        elif caption:
+            await client.send_message(destination_channel_id, caption)
+
+        with open(last_message_file, 'w') as f:
+            json.dump({'id': last_id}, f)
+
+        print(f"Message group up to {last_id} sent successfully")
+        await asyncio.sleep(random.uniform(3, 10))
+
     # Fetching all messages from the source channel starting from the first message
+    current_group_id = None
+    current_group = []
+
     async for message in client.iter_messages(source_channel_id, reverse=True):
         if last_message and message.id <= last_message['id']:
             continue  # Skip messages that have already been sent
 
+        if message.grouped_id:
+            if current_group_id is None or message.grouped_id == current_group_id:
+                current_group_id = message.grouped_id
+                current_group.append(message)
+                continue
+
+            await send_group(current_group)
+            current_group_id = message.grouped_id
+            current_group = [message]
+            continue
+
+        if current_group:
+            await send_group(current_group)
+            current_group = []
+            current_group_id = None
+
         # Sending text messages to the destination channel
-        if message.text:
+        if message.text and not message.media:
             await client.send_message(destination_channel_id, message.text)
         # Sending media messages (photos or documents) to the destination channel
-        if message.media:
-            if isinstance(message.media, (MessageMediaPhoto, MessageMediaDocument)):
-                await client.send_file(destination_channel_id, message.media)
+        if message.media and isinstance(message.media, (MessageMediaPhoto, MessageMediaDocument)):
+            await client.send_file(destination_channel_id, message.media, caption=message.text or None)
 
         # Save the last sent message ID
         with open(last_message_file, 'w') as f:
             json.dump({'id': message.id}, f)
-        
+
         print(f"Message {message.id} sent successfully")
 
         # Random delay between 3 to 10 seconds between each message to avoid being flagged by Telegram
         await asyncio.sleep(random.uniform(3, 10))
+
+    if current_group:
+        await send_group(current_group)
 
 async def main():
     """
