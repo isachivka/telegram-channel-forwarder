@@ -1,0 +1,29 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event.head_commit.author.email != 'autocommit@localhost'
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_LOGIN }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose up -d --build
+            docker system prune -f
