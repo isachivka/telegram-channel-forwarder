@@ -63,6 +63,28 @@ A Python script that forwards messages from one Telegram channel to another usin
 
    The script will ask for a login code sent to your Telegram app if it is the first time you are running it. Enter the code to authenticate.
 
+## Docker
+
+This project can run on a 10-minute cron inside a container. Mount the session and state files from the host so the bot keeps its state.
+
+1. **Build the Image**
+
+   ```bash
+   docker build -t telegram-channel-forwarder .
+   ```
+
+2. **Run with Volume Mounts**
+
+   ```bash
+   docker run -d --name telegram-channel-forwarder \\
+     -v $(pwd)/.env:/app/.env \\
+     -v $(pwd)/last_message.json:/app/last_message.json \\
+     -v \"$(pwd)/Test app.session\":/app/\"Test app.session\" \\
+     telegram-channel-forwarder
+   ```
+
+   The container runs `python script.py` every 10 minutes via cron and logs to stdout.
+
 ## How It Works
 
 - The script connects to the Telegram client using the provided `.env` credentials.
