@@ -111,7 +111,7 @@ async def handle_telegram_session(client):
             json.dump({'id': last_id}, f)
 
         print(f"Message group up to {last_id} sent successfully")
-        await asyncio.sleep(random.uniform(303, 310))
+        await asyncio.sleep(random.uniform(103, 110))
 
     # Fetching all messages from the source channel starting from the first message
     current_group_id = None
@@ -151,7 +151,7 @@ async def handle_telegram_session(client):
         print(f"Message {message.id} sent successfully")
 
         # Random delay between 3 to 10 seconds between each message to avoid being flagged by Telegram
-        await asyncio.sleep(random.uniform(300, 310))
+        await asyncio.sleep(random.uniform(103, 110))
 
     if current_group:
         await send_group(current_group)
