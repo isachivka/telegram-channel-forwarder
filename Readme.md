@@ -76,14 +76,20 @@ This project can run on a 10-minute cron inside a container. Mount the session a
 2. **Run with Volume Mounts**
 
    ```bash
-   docker run -d --name telegram-channel-forwarder \\
-     -v $(pwd)/.env:/app/.env \\
-     -v $(pwd)/last_message.json:/app/last_message.json \\
-     -v \"$(pwd)/Test app.session\":/app/\"Test app.session\" \\
+   docker run -d --name telegram-channel-forwarder \
+     -v $(pwd)/.env:/app/.env \
+     -v $(pwd)/last_message.json:/app/last_message.json \
+     -v "$(pwd)/Test app.session":/app/"Test app.session" \
      telegram-channel-forwarder
    ```
 
    The container runs `python script.py` every 10 minutes via cron and logs to stdout.
+
+3. **Run with Docker Compose**
+
+   ```bash
+   docker compose up -d --build
+   ```
 
 ## How It Works
 

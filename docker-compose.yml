@@ -1,0 +1,10 @@
+services:
+  telegram-channel-forwarder:
+    container_name: telegram-channel-forwarder
+    build:
+      context: .
+    restart: unless-stopped
+    volumes:
+      - ./.env:/app/.env
+      - ./last_message.json:/app/last_message.json
+      - "./Test app.session:/app/Test app.session"
